@@ -91,65 +91,56 @@ if st.button("Spustit bezpečnou AI analýzu 🔮"):
     elif not obsah_textu:
         st.error("❌ Vložte prosím text anotace projektu k analýze.")
     else:
-        with st.spinner("🔮 AI zjišťuje konfiguraci MetaCentra a provádí těžbu dat..."):
-            
-            headers = {
-                "Authorization": f"Bearer {user_api_key}",
-                "Content-Type": "application/json"
-            }
-            
-            # 🛡️ 1) AUTOMATICKÉ ZJIŠTĚNÍ DOSTUPNÝCH MODELŮ NA UNIVERSITNÍ SÍTI
-            base_url = "https://e-infra.cz"
-            vybrany_model = "Thinker"  # Výchozí záloha
-            try:
-                models_response = requests.get(f"{base_url}/v1/models", headers=headers, timeout=10)
-                if models_response.status_code == 200:
-                    dostupne_modely = [m["id"] for m in models_response.json()["data"]]
-                    if dostupne_modely:
-                        # Automaticky vybere první povolený živý model z e-infra sítě
-                        vybrany_model = dostupne_modely[0]
-            except Exception:
-                pass # Pokud zjištění modelů selže, podrží výchozí slovo
+        with st.spinner("🔮 AI v MetaCentru provádí těžbu dat..."):
             
             system_instruction = (
-                "Jsi herní engine DMP Quest pro OP JAK. Analyzuj zadaný text projektu a vytvoř JSON objekt. "
+                "Jsi herní engine DMP Quest pro OP JAK. Analyzuj text projektu a vytvoř JSON objekt. "
                 "Odpověz výhradně ve formátu JSON, nepoužívej žádné úvodní věty, žádné vysvětlování. "
                 "Struktura musí vypadat přesně takto:\n"
                 "{\n"
-                '  "nazev_projektu": "Název zkoumaného výzkumu",\n'
-                '  "datlik_text": "Řeč Datlíka o datech a metodách z textu",\n'
-                '  "matla_text": "Varování dr. Matly ohledně rizik spolupráce a dat",\n'
+                '  "nazev_projektu": "Název výzkumu",\n'
+                '  "datlik_text": "Řeč Datlíka o datech z textu",\n'
+                '  "matla_text": "Varování dr. Matly ohledně rizik",\n'
                 '  "navrzeny_text": "Vzorový text evolučního plánu pro šablonu DMP"\n'
                 "}"
             )
             
-            payload = {
-                "model": vybrany_model,
-                "messages": [
-                    {"role": "system", "content": system_instruction},
-                    {"role": "user", "content": obsah_textu}
-                ],
-                "temperature": 0.1,
-                "stream": False
-            }
-            
             try:
-                response = requests.post(f"{base_url}/v1/chat/completions", json=payload, headers=headers, timeout=40)
+                headers = {
+                    "Authorization": f"Bearer {user_api_key}",
+                    "Content-Type": "application/json"
+                }
+                payload = {
+                    "model": "Thinker",
+                    "messages": [
+                        {"role": "system", "content": system_instruction},
+                        {"role": "user", "content": obsah_textu}
+                    ],
+                    "temperature": 0.1
+                }
+                
+                # 📡 OPRAVENÁ STRATEGICKÁ ADRESA: Voláme přímo dedikovaný LLM uzel brány
+                response = requests.post(
+                    "https://e-infra.cz", 
+                    json=payload, 
+                    headers=headers,
+                    timeout=40
+                )
                 
                 if response.status_code == 200:
-                    odpoved_text = response.text
+                    odpoved_text = response.json()["choices"][0]["message"]["content"].strip()
                     match = re.search(r'\{.*\}', odpoved_text, re.DOTALL)
                     if match:
                         st.session_state.quest_data = json.loads(match.group(0))
                         st.session_state.dmp_data["nazev_projektu"] = st.session_state.quest_data.get("nazev_projektu", "Analyzovaný výzkum")
-                        st.success(f"🎉 Úspěch! Komunikace proběhla přes model: {vybrany_model}")
+                        st.success("🎉 Živá AI v MetaCentru úspěšně odpověděla a vygenerovala herní plán!")
                     else:
-                        st.error("❌ AI odpověděla, ale formát dat byl nestrukturovaný. Obsah odpovědi:")
+                        st.error("❌ Formát dat byl nestrukturovaný. Obsah odpovědi:")
                         st.code(odpoved_text)
                 else:
-                    st.error(f"❌ Server e-INFRA vrátil kód {response.status_code}. Detaily: {response.text}")
+                    st.error(f"❌ Server e-INFRA vrátil kód {response.status_code}. Spojení se nepodařilo.")
             except Exception as e:
-                st.error(f"❌ Chyba síťového přenosu: {str(e)}")
+                st.error(f"❌ Chyba přenosu: {str(e)}")
 
 st.divider()
 

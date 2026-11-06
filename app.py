@@ -30,7 +30,8 @@ def vygenerovat_oficialni_html_dmp(data_z_json_hry):
         <style>
             body {{ font-family: Arial, sans-serif; color: #333333; line-height: 1.6; padding: 40px; max-width: 800px; margin: 0 auto; }}
             .header-logos {{ display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #005691; padding-bottom: 20px; margin-bottom: 30px; }}
-            .logo-eu {{ height: 65px; }} .logo-msmt {{ height: 65px; }}
+            .logo-eu {{ height: 60px; width: auto; }}
+            .logo-msmt {{ height: 60px; width: auto; }}
             h1 {{ color: #005691; font-size: 24px; text-transform: uppercase; margin-top: 0; }}
             h2 {{ color: #005691; font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 5px; margin-top: 25px; }}
             .meta-info {{ background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 30px; font-size: 14px; }}
@@ -38,12 +39,10 @@ def vygenerovat_oficialni_html_dmp(data_z_json_hry):
         </style>
     </head>
     <body>
-                          <div class="header-logos">
-            <!-- Lokální odkaz na grafické logo spolufinancování EU ve stejné složce -->
-            <img class="logo-eu" src="logo_eu.png" alt="Spolufinancováno EU">
-            <!-- Lokální odkaz na grafické logo MŠMT ve stejné složce -->
+        <div class="header-logos">
+            <!-- Čisté a jediné lokální zobrazení unijního a ministerského loga -->
+            <img class="logo-eu" src="logo_eu.png" alt="Spolufinancováno Evropskou unií">
             <img class="logo-msmt" src="logo_msmt.png" alt="MŠMT ČR">
-        </div>
         </div>
         <h1>Plán správy dat (Data Management Plan)</h1>
         <div class="meta-info">
@@ -79,6 +78,7 @@ if "dmp_data" not in st.session_state:
 
 with st.sidebar:
     st.header("📄 Průběžný DMP Artefakt")
+    st.caption("Soubory se automaticky aktualizují při každé změně.")
     aktualni_html = vygenerovat_oficialni_html_dmp(st.session_state.dmp_data)
     b64_html = base64.b64encode(aktualni_html.encode('utf-8')).decode('utf-8')
     href_html = f'<a href="data:text/html;base64,{b64_html}" download="DMP_Export_OPJAK.html" style="text-decoration:none;"><button style="width:100%; padding:12px; background-color:#005691; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer; margin-bottom:10px;">📄 STÁHNOUT PDF / HTML</button></a>'

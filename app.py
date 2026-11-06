@@ -7,6 +7,7 @@ st.set_page_config(page_title="DMP Quest: OP JAK", page_icon="🛡️", layout="
 st.markdown("""
     <style>
     .stButton>button { width: 100%; background-color: #f43f5e; color: white; border-radius: 8px; font-weight: bold; }
+    .stButton>button:hover { background-color: #e11d48; }
     .npc-box-datlik { background-color: rgba(56, 189, 248, 0.1); border-left: 5px solid #38bdf8; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
     .npc-box-matla { background-color: rgba(244, 63, 94, 0.1); border-left: 5px solid #f43f5e; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
     </style>
@@ -103,5 +104,4 @@ upraveny_text = st.text_area("Aktuální text plánu pro OP JAK šablonu:", valu
 if st.button("Schválit tento text, zapsat do DMP a získat +30 XP 🎯"):
     st.session_state.dmp_data["kapitoly"]["sber_a_generovani"]["text_pro_sabonu"] = upraveny_text
     st.balloons()
-    st.success("🎉 Úkol splněn! Boční panel se okamžitě aktualizoval.")
-    st.rerun()
+    st.success("🎉 Úkol splněn! Data byla uložena do paměti.")

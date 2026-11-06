@@ -93,23 +93,23 @@ if st.button("Spustit bezpečnou AI analýzu 🔮"):
     else:
         with st.spinner("🔮 AI v MetaCentru provádí těžbu dat..."):
             
-            # Zpřísněný a zjednodušený prompt pro open-source model v e-infra
             system_instruction = (
                 "Jsi herní engine DMP Quest pro OP JAK. Analyzuj zadaný text projektu a vytvoř JSON objekt. "
                 "Odpověz výhradně ve formátu JSON, nepoužívej žádné úvodní věty, žádné vysvětlování. "
                 "Struktura musí vypadat přesně takto:\n"
                 "{\n"
-                '  "nazev_projektu": "Nosiče léčiv a elektronová mikroskopie",\n'
-                '  "datlik_text": "Skvělé, v textu vidím metody elektronové mikroskopie a Ramanovy spektroskopie. Připravil jsem evoluční plán pro kapitolu 1.",\n'
-                '  "matla_text": "Pozor na Maytansine a spolupráci s FaF UK a UPOL, musíme ošetřit přenos a sdílení dat mezi institucemi!",\n'
-                '  "navrzeny_text": "V počáteční fázi projektu budou experimentální data z elektronové mikroskopie a Ramanovy spektroskopie ukládána v otevřených formátech TIFF a CSV."\n'
+                '  "nazev_projektu": "Název zkoumaného výzkumu",\n'
+                '  "datlik_text": "Řeč Datlíka o datech a metodách z textu",\n'
+                '  "matla_text": "Varování dr. Matly ohledně rizik spolupráce a dat",\n'
+                '  "navrzeny_text": "Vzorový text evolučního plánu pro šablonu DMP"\n'
                 "}"
             )
             
             try:
                 headers = {"Authorization": f"Bearer {user_api_key}", "Content-Type": "application/json"}
                 payload = {
-                    "model": "thinker",
+                    # 🚀 KLÍČOVÁ OPRAVA: Přesný název s velkým T
+                    "model": "Thinker",
                     "messages": [
                         {"role": "system", "content": system_instruction},
                         {"role": "user", "content": obsah_textu}
@@ -119,9 +119,9 @@ if st.button("Spustit bezpečnou AI analýzu 🔮"):
                 response = requests.post("https://e-infra.cz", json=payload, headers=headers)
                 
                 if response.status_code == 200:
-                    odpoved_text = response.json()["choices"]["message"]["content"].strip()
+                    odpoved_json = response.json()
+                    odpoved_text = odpoved_json["choices"][0]["message"]["content"].strip()
                     
-                    # Pokus najít JSON kód v textu
                     match = re.search(r'\{.*\}', odpoved_text, re.DOTALL)
                     if match:
                         cisty_json_text = match.group(0)
@@ -129,25 +129,22 @@ if st.button("Spustit bezpečnou AI analýzu 🔮"):
                         st.session_state.dmp_data["nazev_projektu"] = st.session_state.quest_data.get("nazev_projektu", "Analyzovaný výzkum")
                         st.success("🎉 Analýza dokončena! Nový quest byl úspěšně vygenerován.")
                     else:
-                        st.error("❌ AI vrátila neočekávaný formát textu. Zkuste analýzu spustit ještě jednou.")
+                        st.error("❌ Model vrátil text bez platné JSON struktury. Ukázka vráceného textu:")
+                        st.code(odpoved_text)
                 else:
-                    st.error(f"Chyba API e-INFRA: Kód {response.status_code}. Zkontrolujte platnost tokenu.")
+                    st.error(f"❌ Chyba API e-INFRA: Kód {response.status_code}. Zkontrolujte platnost tokenu a modelu.")
             except Exception as e:
-                st.error(f"Chyba při komunikaci se serverem e-INFRA: {str(e)}")
+                st.error(f"❌ Detailní popis chyby komunikace: {str(e)}")
 
 st.divider()
 
 if st.session_state.quest_data:
     st.subheader(f"⚔️ Dynamický Quest na míru")
-    
     st.markdown(f'<div class="npc-box-datlik"><strong>Prof. Datlík 🦆:</strong><br><em>„{st.session_state.quest_data.get("datlik_text", "")}“</em></div>', unsafe_allow_html=True)
     st.markdown(f'<div class="npc-box-matla"><strong>Dr. Matla 🦫:</strong><br><em>„{st.session_state.quest_data.get("matla_text", "")}“</em></div>', unsafe_allow_html=True)
-    
     st.divider()
-    
     upraveny_text = st.text_area("Schvalte nebo upravte text vygenerovaný AI:", value=st.session_state.quest_data.get("navrzeny_text", ""), height=130)
-    
-    if st.button("Schválit tento AI text a zapsat do DMP 🎯"):
+    if st.button("Schválit tento AI text and zapsat do DMP 🎯"):
         st.session_state.dmp_data["kapitoly"]["sber_a_generovani"]["text_pro_sabonu"] = upraveny_text
         st.balloons()
         st.success("🎉 Zapsáno do ministerské šablony! Zkontrolujte PDF v bočním panelu.")

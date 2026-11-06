@@ -12,7 +12,6 @@ st.markdown("""
     .stButton>button:hover { background-color: #e11d48; }
     .npc-box-datlik { background-color: rgba(56, 189, 248, 0.1); border-left: 5px solid #38bdf8; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
     .npc-box-matla { background-color: rgba(244, 63, 94, 0.1); border-left: 5px solid #f43f5e; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
-    .upload-zone { background-color: rgba(245, 158, 11, 0.05); border: 2px dashed #f59e0b; padding: 20px; border-radius: 8px; margin-bottom: 25px; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -71,20 +70,13 @@ if "quest_data" not in st.session_state:
 
 with st.sidebar:
     st.header("🔑 Zabezpečené AI zřídlo")
-    user_api_key = st.text_input("Zadejte e-INFRA CZ Token:", type="password", placeholder="Bearer token z chat.ai.e-infra.cz...")
+    user_api_key = st.text_input("Zadejte e-INFRA CZ Token:", type="password", placeholder="Bearer token...")
     st.divider()
     st.header("📄 Průběžný DMP Artefakt")
     aktualni_html = vygenerovat_oficialni_html_dmp(st.session_state.dmp_data)
     b64_html = base64.b64encode(aktualni_html.encode('utf-8')).decode('utf-8')
     href_html = f'<a href="data:text/html;base64,{b64_html}" download="DMP_Export_OPJAK.html" style="text-decoration:none;"><button style="width:100%; padding:12px; background-color:#005691; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer; margin-bottom:10px;">📄 STÁHNOUT PDF / HTML</button></a>'
     st.markdown(href_html, unsafe_allow_html=True)
-    st.download_button(
-        label="💾 ULOŽIT HERNÍ POZICI (JSON)",
-        data=json.dumps(st.session_state.dmp_data, indent=2, ensure_ascii=False),
-        file_name="dmp_quest_save.json",
-        mime="application/json",
-        use_container_width=True
-    )
 
 st.title("🛡️ DMP Quest: OP JAK AI Engine")
 st.markdown("**Hrdina:** Výzkumník 🧪  |  **Úroveň:** 1 (Novic) 🧙‍♂️")
@@ -100,11 +92,18 @@ if st.button("Spustit bezpečnou AI analýzu 🔮"):
         st.error("❌ Vložte prosím text anotace projektu k analýze.")
     else:
         with st.spinner("🔮 AI v MetaCentru provádí těžbu dat..."):
+            
+            # Zpřísněný a zjednodušený prompt pro open-source model v e-infra
             system_instruction = (
-                "Jsi Game Master hry DMP Quest pro OP JAK. Analyzuj text projektu a extrahuj data pro DMP. "
-                "Tvým úkolem je vrátit výhradně platný JSON objekt. Nezačínej text žádnými úvody ani ho neobaluj do ```json. "
-                "Struktura JSON musí obsahovat klíče: "
-                '{"nazev_projektu": "Stručný název výzkumu", "datlik_text": "Vtipná řeč Datlíka o výzkumu a datech, co z něj vzniknou", "matla_text": "Rýpavé varování dr. Matly ohledně rizik tohoto konkrétního výzkumu", "navrzeny_text": "Vzorový text evolučního plánu pro šablonu DMP šitý na míru tomuto oboru"}'
+                "Jsi herní engine DMP Quest pro OP JAK. Analyzuj zadaný text projektu a vytvoř JSON objekt. "
+                "Odpověz výhradně ve formátu JSON, nepoužívej žádné úvodní věty, žádné vysvětlování. "
+                "Struktura musí vypadat přesně takto:\n"
+                "{\n"
+                '  "nazev_projektu": "Nosiče léčiv a elektronová mikroskopie",\n'
+                '  "datlik_text": "Skvělé, v textu vidím metody elektronové mikroskopie a Ramanovy spektroskopie. Připravil jsem evoluční plán pro kapitolu 1.",\n'
+                '  "matla_text": "Pozor na Maytansine a spolupráci s FaF UK a UPOL, musíme ošetřit přenos a sdílení dat mezi institucemi!",\n'
+                '  "navrzeny_text": "V počáteční fázi projektu budou experimentální data z elektronové mikroskopie a Ramanovy spektroskopie ukládána v otevřených formátech TIFF a CSV."\n'
+                "}"
             )
             
             try:
@@ -122,20 +121,19 @@ if st.button("Spustit bezpečnou AI analýzu 🔮"):
                 if response.status_code == 200:
                     odpoved_text = response.json()["choices"]["message"]["content"].strip()
                     
-                    # 🧼 Chirurgické čištění textu pomocí regulárních výrazů:
-                    # Najde v textu cokoliv mezi první { a poslední } a vytáhne jen čistý JSON
+                    # Pokus najít JSON kód v textu
                     match = re.search(r'\{.*\}', odpoved_text, re.DOTALL)
                     if match:
                         cisty_json_text = match.group(0)
                         st.session_state.quest_data = json.loads(cisty_json_text)
-                        st.session_state.dmp_data["nazev_projektu"] = st.session_state.quest_data["nazev_projektu"]
+                        st.session_state.dmp_data["nazev_projektu"] = st.session_state.quest_data.get("nazev_projektu", "Analyzovaný výzkum")
                         st.success("🎉 Analýza dokončena! Nový quest byl úspěšně vygenerován.")
                     else:
-                        st.error("❌ AI vrátila text, který neobsahuje platnou JSON strukturu. Zkuste analýzu znovu.")
+                        st.error("❌ AI vrátila neočekávaný formát textu. Zkuste analýzu spustit ještě jednou.")
                 else:
                     st.error(f"Chyba API e-INFRA: Kód {response.status_code}. Zkontrolujte platnost tokenu.")
             except Exception as e:
-                st.error(f"Chyba při komunikaci: {str(e)}")
+                st.error(f"Chyba při komunikaci se serverem e-INFRA: {str(e)}")
 
 st.divider()
 

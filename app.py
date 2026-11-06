@@ -21,6 +21,9 @@ def vygenerovat_oficialni_html_dmp(data_z_json_hry):
     sdileni = data_z_json_hry["kapitoly"].get("sdileni_a_udrzitelnost", {}).get("text_pro_sabonu", "")
     naklady = data_z_json_hry["kapitoly"].get("odpovednost_a_naklady", {}).get("text_pro_sabonu", "")
 
+    # Oficiální a přímý link na spojené logo spolufinancování EU z portálu DotaceEU
+    url_kombinovane_logo = "https://dotaceeu.cz"
+
     html_template = f"""
     <!DOCTYPE html>
     <html lang="cs">
@@ -29,19 +32,25 @@ def vygenerovat_oficialni_html_dmp(data_z_json_hry):
         <title>DMP - {data_z_json_hry.get('nazev_projektu', 'Projekt OP JAK')}</title>
         <style>
             body {{ font-family: Arial, sans-serif; color: #333333; line-height: 1.6; padding: 40px; max-width: 800px; margin: 0 auto; }}
-            .header-logos {{ display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #005691; padding-bottom: 20px; margin-bottom: 30px; }}
-            .logo-eu {{ height: 60px; width: auto; }}
-            .logo-msmt {{ height: 60px; width: auto; }}
+            .header-logos {{ display: flex; justify-content: center; align-items: center; border-bottom: 2px solid #005691; padding-bottom: 20px; margin-bottom: 30px; }}
+            .logo-opjak {{ height: 75px; width: auto; }}
             h1 {{ color: #005691; font-size: 24px; text-transform: uppercase; margin-top: 0; }}
             h2 {{ color: #005691; font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 5px; margin-top: 25px; }}
             .meta-info {{ background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 30px; font-size: 14px; }}
             .content-section {{ margin-bottom: 20px; text-align: justify; }}
+            @media print {{
+                body {{ padding: 0; margin: 0; font-size: 12pt; }}
+                .no-print {{ display: none; }}
+                @page {{ size: A4; margin: 2cm; }}
+                h2 {{ page-break-after: avoid; }}
+                .content-section {{ page-break-inside: avoid; }}
+            }}
         </style>
     </head>
     <body>
-               <div class="header-logos">
-            <!-- Jediné kombinované logo projektu obsahující jak EU, tak MŠMT -->
-            <img class="logo-eu" src="loga_spojena.png" alt="Publicita OP JAK" style="height: 65px; width: auto;">
+        <div class="header-logos">
+            <!-- Jediné spojené oficiální logo spolufinancování -->
+            <img class="logo-opjak" src="{url_kombinovane_logo}" alt="Spolufinancováno Evropskou unií">
         </div>
         <h1>Plán správy dat (Data Management Plan)</h1>
         <div class="meta-info">
@@ -55,6 +64,9 @@ def vygenerovat_oficialni_html_dmp(data_z_json_hry):
         <div class="content-section"><h2>4. Právní požadavky, autorská práva a licence</h2><p>{pravni or '[Otázky duševního vlastnictví budou dohodnuty do M12.]'}</p></div>
         <div class="content-section"><h2>5. Sdílení dat a dlouhodobé uchování</h2><p>{sdileni or '[Dlouhodobé uložení dat po skončení projektu bude zajištěno v repozitáři.]'}</p></div>
         <div class="content-section"><h2>6. Odpovědnost a zdroje (Náklady)</h2><p>{naklady or '[Odpovědnost za správu dat nese hlavní řešitel projektu.]'}</p></div>
+        <div class="no-print" style="margin-top: 40px; text-align: center; border-top: 1px dashed #ccc; padding-top: 20px;">
+            <button onclick="window.print()" style="padding: 10px 20px; background: #005691; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Tisk / Uložit do PDF (Ctrl+P)</button>
+        </div>
     </body>
     </html>
     """

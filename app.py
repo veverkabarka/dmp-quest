@@ -38,9 +38,13 @@ def vygenerovat_oficialni_html_dmp(data_z_json_hry):
         </style>
     </head>
     <body>
-        <div class="header-logos">
+                    <div class="header-logos">
+            <!-- Opravený přímý odkaz na grafické logo spolufinancování EU -->
             <img class="logo-eu" src="https://dotaceeu.cz" alt="Spolufinancováno EU">
-            <img class="logo-msmt" src="https://msmt.gov.cz" alt="MŠMT ČR">
+            <!-- Opravený přímý odkaz na grafické logo MŠMT -->
+            <img class="logo-msmt" src="https://msmt.cz" alt="MŠMT ČR">
+        </div>
+
         </div>
         <h1>Plán správy dat (Data Management Plan)</h1>
         <div class="meta-info">

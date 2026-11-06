@@ -15,7 +15,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- POMOCNÁ FUNKCE: Generování oficiální tiskové šablony s logy MŠMT a EU ---
+# --- POMOCNÁ FUNKCE: Generování resmi tiskové šablony s logy MŠMT a EU ---
 def vygenerovat_oficialni_html_dmp(data_z_json_hry):
     sber = data_z_json_hry["kapitoly"].get("sber_a_generovani", {}).get("text_pro_sabonu", "")
     metadata = data_z_json_hry["kapitoly"].get("metadata_a_dokumentace", {}).get("text_pro_sabonu", "")
@@ -150,7 +150,7 @@ st.markdown("""
     <strong>Dr. Matla 🦫:</strong><br>
     <em>„No moment, profesore! Abychom se nespálili. Teď si sice myslíte, že stará data nepotřebujete, ale vsadím se, 
     že v půlce projektu poběžíte prosit kolegy z Prahy o jejich starší databáze. Schvalte klidně Datlíkův plán, 
-    ale pamatujte, že v měsíci M12 vás tu zkontroluji, jestli jste do projektu nějaká cizí data tajně nepropašovali!“</em>
+    ale pamatujte, že v měsíci M12 vás tu zkontroluji, jestli jste do projektu NSA data tajně nepropašovali!“</em>
 </div>
 """, unsafe_allow_html=True)
 

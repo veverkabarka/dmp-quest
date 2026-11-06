@@ -39,10 +39,9 @@ def vygenerovat_oficialni_html_dmp(data_z_json_hry):
         </style>
     </head>
     <body>
-        <div class="header-logos">
-            <!-- Čisté a jediné lokální zobrazení unijního a ministerského loga -->
-            <img class="logo-eu" src="logo_eu.png" alt="Spolufinancováno Evropskou unií">
-            <img class="logo-msmt" src="logo_msmt.png" alt="MŠMT ČR">
+               <div class="header-logos">
+            <!-- Jediné kombinované logo projektu obsahující jak EU, tak MŠMT -->
+            <img class="logo-eu" src="loga_spojena.png" alt="Publicita OP JAK" style="height: 65px; width: auto;">
         </div>
         <h1>Plán správy dat (Data Management Plan)</h1>
         <div class="meta-info">

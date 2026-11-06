@@ -21,9 +21,6 @@ def vygenerovat_oficialni_html_dmp(data_z_json_hry):
     sdileni = data_z_json_hry["kapitoly"].get("sdileni_a_udrzitelnost", {}).get("text_pro_sabonu", "")
     naklady = data_z_json_hry["kapitoly"].get("odpovednost_a_naklady", {}).get("text_pro_sabonu", "")
 
-    # Oficiální a přímý link na spojené logo spolufinancování EU z portálu DotaceEU
-    url_kombinovane_logo = "https://dotaceeu.cz"
-
     html_template = f"""
     <!DOCTYPE html>
     <html lang="cs">
@@ -33,7 +30,7 @@ def vygenerovat_oficialni_html_dmp(data_z_json_hry):
         <style>
             body {{ font-family: Arial, sans-serif; color: #333333; line-height: 1.6; padding: 40px; max-width: 800px; margin: 0 auto; }}
             .header-logos {{ display: flex; justify-content: center; align-items: center; border-bottom: 2px solid #005691; padding-bottom: 20px; margin-bottom: 30px; }}
-            .logo-opjak {{ height: 75px; width: auto; }}
+            .logo-opjak {{ height: 65px; width: auto; }}
             h1 {{ color: #005691; font-size: 24px; text-transform: uppercase; margin-top: 0; }}
             h2 {{ color: #005691; font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 5px; margin-top: 25px; }}
             .meta-info {{ background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 30px; font-size: 14px; }}
@@ -49,8 +46,8 @@ def vygenerovat_oficialni_html_dmp(data_z_json_hry):
     </head>
     <body>
         <div class="header-logos">
-            <!-- Jediné spojené oficiální logo spolufinancování -->
-            <img class="logo-opjak" src="{url_kombinovane_logo}" alt="Spolufinancováno Evropskou unií">
+            <!-- Jediné spojené lokální logo ve stejné složce jako stažený soubor -->
+            <img class="logo-opjak" src="loga_spojena.png" alt="Publicita OP JAK">
         </div>
         <h1>Plán správy dat (Data Management Plan)</h1>
         <div class="meta-info">
